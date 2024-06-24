@@ -42,21 +42,9 @@ def generate_presigned_url(s3_uri):
 # Function to retrieve documents, generate URLs, and format the response
 def retrieve_and_format_response(query, retriever, llm):
     docs = retriever.get_relevant_documents(query)
-
-    # Filter out irrelevant documents based on query
-    # ADDED: Filter logic to ensure relevance
-    relevant_docs = [doc for doc in docs if query.lower() in doc.page_content.lower()]
-
-    if not relevant_docs:
-        # ADDED: Generate a conversational response when no relevant documents are found
-        prompt = f"Instruction: You are a helpful assistant. The user asked: '{query}', but I did not find any relevant documents. \
-                   Please provide a polite and engaging response to the user, asking them for more information or offering help in another way."
-        message = HumanMessage(content=prompt)
-        response = llm([message])
-        return {"content": response.content}
     
     formatted_docs = []
-    for doc in relevant_docs:
+    for doc in docs:
         content_data = doc.page_content
         s3_uri = doc.metadata['id']
         s3_gen_url = generate_presigned_url(s3_uri)
@@ -185,8 +173,7 @@ if user_input:
     
     # Generate and display bot response
     with st.spinner("Thinking..."):
-        response_with_docs = retrieve_and_format_response(user_input, retriever, llm)
-        bot_response = response_with_docs['content']  # Ensure to access the 'content' key from the response dictionary
+        bot_response = retrieve_and_format_response(user_input, retriever, llm).content
     
     st.session_state["messages"].append({"role": "assistant", "content": bot_response})
     

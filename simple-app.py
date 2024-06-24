@@ -1,4 +1,4 @@
-import streamlit as st
+rt streamlit as st
 from langchain_voyageai import VoyageAIEmbeddings
 import os
 import boto3
@@ -66,7 +66,7 @@ def retrieve_and_format_response(query, retriever, llm):
     message = HumanMessage(content=prompt)
 
     response = llm([message])
-    return {"content": response.content}
+    return response
 
 # Function to save chat history to a file
 def save_chat_history_to_file(filename, history):

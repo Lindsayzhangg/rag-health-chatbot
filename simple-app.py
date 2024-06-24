@@ -53,7 +53,7 @@ def retrieve_and_format_response(query, retriever, llm):
                    Please provide a polite and engaging response to the user, asking them for more information or offering help in another way."
         message = HumanMessage(content=prompt)
         response = llm([message])
-        return {"content": str(response[0])}
+        return {"content": response[0].text}
     
     formatted_docs = []
     for doc in relevant_docs:
@@ -78,7 +78,7 @@ def retrieve_and_format_response(query, retriever, llm):
     message = HumanMessage(content=prompt)
 
     response = llm([message])
-    return {"content": str(response[0])}
+    return {"content": response[0].text}
 
 # Function to save chat history to a file
 def save_chat_history_to_file(filename, history):

@@ -179,3 +179,16 @@ if user_input:
     
     with st.chat_message("assistant"):
         st.markdown(bot_response)
+
+# Add an "End Conversation" button
+if st.button("End Conversation"):
+    # Save chat history to a file and upload to S3
+    session_id = str(uuid.uuid4())
+    chat_history = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state["messages"]])
+    local_filename = f"chat_history_{session_id}.txt"
+    save_chat_history_to_file(local_filename, chat_history)
+    chat_history_key = f"raw-data/chat_history_{session_id}.txt"
+    upload_file_to_s3(s3_client, "chat-history-process", chat_history_key, local_filename)
+    st.success(f"Chat history saved and uploaded to S3 as '{chat_history_key}'")
+    # Clear chat history from session state
+    st.session_state["messages"] = []

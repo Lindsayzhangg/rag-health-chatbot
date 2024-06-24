@@ -74,7 +74,7 @@ def save_chat_history_to_file(filename, history):
         file.write(history)
 
 # Function to upload the file to S3
-def upload_file_to_s3(bucket, key, filename):
+def upload_file_to_s3(s3_client, bucket, key, filename):
     s3_client.upload_file(filename, bucket, key)
 
 # Example usage with memory

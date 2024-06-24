@@ -70,8 +70,7 @@ def save_chat_history_to_file(filename, history):
         file.write(history)
 
 # Function to upload the file to S3
-# ADDED: Updated the definition to accept four arguments
-def upload_file_to_s3(s3_client, bucket, key, filename):  
+def upload_file_to_s3(s3_client, bucket, key, filename):
     s3_client.upload_file(filename, bucket, key)
 
 # Example usage with memory
@@ -185,7 +184,6 @@ if st.button("End Conversation"):
     local_filename = f"chat_history_{session_id}.txt"
     save_chat_history_to_file(local_filename, chat_history)
     chat_history_key = f"raw-data/chat_history_{session_id}.txt"
-    # ADDED: Corrected function call with four arguments
     upload_file_to_s3(s3_client, "chat-history-process", chat_history_key, local_filename)
     st.success(f"Chat history saved and uploaded to S3 as '{chat_history_key}'")
     # Clear chat history from session state

@@ -3,15 +3,19 @@ from langchain_voyageai import VoyageAIEmbeddings
 import os
 import boto3
 from urllib.parse import urlparse
+from pinecone import Pinecone
 import pinecone
 from langchain_openai import ChatOpenAI
 import openai
 from langchain.chains import LLMChain, RetrievalQA
+import time
 import re
 from langchain_pinecone import PineconeVectorStore
 from langchain.memory import ConversationBufferMemory
 from langchain.schema import HumanMessage
 from langchain.prompts import ChatPromptTemplate
+from langchain.chains import ConversationChain
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 import uuid
 import warnings
@@ -62,7 +66,7 @@ def retrieve_and_format_response(query, retriever, llm):
     message = HumanMessage(content=prompt)
 
     response = llm([message])
-    return response
+    return {"content": response.content}
 
 # Function to save chat history to a file
 def save_chat_history_to_file(filename, history):
@@ -122,7 +126,7 @@ s3_client = boto3.client(
 )
 # PINECONE
 os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
-pinecone.init(api_key=PINECONE_API_KEY)
+pc = Pinecone(api_key=PINECONE_API_KEY)
 index_name = "test"
 openai.api_key = OPENAI_API_KEY
 

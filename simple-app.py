@@ -48,7 +48,12 @@ def retrieve_and_format_response(query, retriever, llm):
     relevant_docs = [doc for doc in docs if query.lower() in doc.page_content.lower()]
 
     if not relevant_docs:
-        return {"content": "I don't know, I did not find the relevant data in the knowledge base."}
+        # ADDED: Generate a conversational response when no relevant documents are found
+        prompt = f"Instruction: You are a helpful assistant. The user asked: '{query}', but I did not find any relevant documents. \
+                   Please provide a polite and engaging response to the user, asking them for more information or offering help in another way."
+        message = HumanMessage(content=prompt)
+        response = llm([message])
+        return {"content": response[0].content}
     
     formatted_docs = []
     for doc in relevant_docs:

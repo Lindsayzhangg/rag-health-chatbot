@@ -78,7 +78,7 @@ def retrieve_and_format_response(query, retriever, llm):
     message = HumanMessage(content=prompt)
 
     response = llm([message])
-    return {"content": response[0].content}
+    return {"content": response.content}
 
 # Function to save chat history to a file
 def save_chat_history_to_file(filename, history):

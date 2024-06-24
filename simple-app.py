@@ -3,19 +3,15 @@ from langchain_voyageai import VoyageAIEmbeddings
 import os
 import boto3
 from urllib.parse import urlparse
-from pinecone import Pinecone
 import pinecone
 from langchain_openai import ChatOpenAI
 import openai
 from langchain.chains import LLMChain, RetrievalQA
-import time
 import re
 from langchain_pinecone import PineconeVectorStore
 from langchain.memory import ConversationBufferMemory
 from langchain.schema import HumanMessage
 from langchain.prompts import ChatPromptTemplate
-from langchain.chains import ConversationChain
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 import uuid
 import warnings
@@ -66,7 +62,7 @@ def retrieve_and_format_response(query, retriever, llm):
     message = HumanMessage(content=prompt)
 
     response = llm([message])
-    return {"content": response.content}
+    return response
 
 # Function to save chat history to a file
 def save_chat_history_to_file(filename, history):
@@ -74,7 +70,8 @@ def save_chat_history_to_file(filename, history):
         file.write(history)
 
 # Function to upload the file to S3
-def upload_file_to_s3(s3_client, bucket, key, filename):
+# ADDED: Updated the definition to accept four arguments
+def upload_file_to_s3(s3_client, bucket, key, filename):  
     s3_client.upload_file(filename, bucket, key)
 
 # Example usage with memory
@@ -126,7 +123,7 @@ s3_client = boto3.client(
 )
 # PINECONE
 os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
-pc = Pinecone(api_key=PINECONE_API_KEY)
+pinecone.init(api_key=PINECONE_API_KEY)
 index_name = "test"
 openai.api_key = OPENAI_API_KEY
 
@@ -188,6 +185,7 @@ if st.button("End Conversation"):
     local_filename = f"chat_history_{session_id}.txt"
     save_chat_history_to_file(local_filename, chat_history)
     chat_history_key = f"raw-data/chat_history_{session_id}.txt"
+    # ADDED: Corrected function call with four arguments
     upload_file_to_s3(s3_client, "chat-history-process", chat_history_key, local_filename)
     st.success(f"Chat history saved and uploaded to S3 as '{chat_history_key}'")
     # Clear chat history from session state

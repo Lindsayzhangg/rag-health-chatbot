@@ -51,7 +51,7 @@ def retrieve_and_format_response(query, retriever, llm):
         return {"content": "I don't know, I did not find the relevant data in the knowledge base."}
     
     formatted_docs = []
-    for doc in docs:
+    for doc in relevant_docs:
         content_data = doc.page_content
         s3_uri = doc.metadata['id']
         s3_gen_url = generate_presigned_url(s3_uri)
@@ -73,7 +73,7 @@ def retrieve_and_format_response(query, retriever, llm):
     message = HumanMessage(content=prompt)
 
     response = llm([message])
-    return response
+    return {"content": response[0].content}
 
 # Function to save chat history to a file
 def save_chat_history_to_file(filename, history):
@@ -180,7 +180,8 @@ if user_input:
     
     # Generate and display bot response
     with st.spinner("Thinking..."):
-        bot_response = retrieve_and_format_response(user_input, retriever, llm).content
+        response_with_docs = retrieve_and_format_response(user_input, retriever, llm)
+        bot_response = response_with_docs['content']  # Ensure to access the 'content' key from the response dictionary
     
     st.session_state["messages"].append({"role": "assistant", "content": bot_response})
     

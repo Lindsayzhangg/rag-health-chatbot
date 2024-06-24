@@ -53,7 +53,7 @@ def retrieve_and_format_response(query, retriever, llm):
                    Please provide a polite and engaging response to the user, asking them for more information or offering help in another way."
         message = HumanMessage(content=prompt)
         response = llm([message])
-        return {"content": response[0].content}
+        return {"content": response[0].text}
     
     formatted_docs = []
     for doc in relevant_docs:

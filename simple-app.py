@@ -42,6 +42,13 @@ def generate_presigned_url(s3_uri):
 # Function to retrieve documents, generate URLs, and format the response
 def retrieve_and_format_response(query, retriever, llm):
     docs = retriever.get_relevant_documents(query)
+
+    # Filter out irrelevant documents based on query
+    # ADDED: Filter logic to ensure relevance
+    relevant_docs = [doc for doc in docs if query.lower() in doc.page_content.lower()]
+
+    if not relevant_docs:
+        return {"content": "I don't know, I did not find the relevant data in the knowledge base."}
     
     formatted_docs = []
     for doc in docs:
